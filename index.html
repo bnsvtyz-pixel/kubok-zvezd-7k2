@@ -299,7 +299,6 @@ section{margin-bottom:1.5em}
   .hunt .pr{grid-column:2}
   #dock{gap:6px; padding:7px 8px}
   #dock button{padding:7px 9px; font-size:13px}
-  #soundLabel{display:none}
   #stage{padding-bottom:150px}
   #dock .stat{max-width:100%; flex-basis:100%; text-align:center}
 }
@@ -477,10 +476,6 @@ section{margin-bottom:1.5em}
     <span id="micLabel">Включить микрофон</span>
   </button>
   <button id="toggleBtn" type="button">Открыть вручную</button>
-  <button id="soundBtn" type="button" aria-pressed="true" title="Шуршание пергамента">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path id="wave" d="M16.5 8.5a5 5 0 0 1 0 7"/></svg>
-    <span id="soundLabel">Звук</span>
-  </button>
   <div class="stat" id="stat" aria-live="polite"><span class="mic-dot"></span> <span id="statText">Микрофон выключен. Карту можно открыть кнопкой.</span></div>
 </div>
 
@@ -490,55 +485,9 @@ section{margin-bottom:1.5em}
   const $ = s => document.querySelector(s);
   const body = document.body, page = $('#page'), stage = $('#stage'), flash = $('#flash');
   const micBtn = $('#micBtn'), micLabel = $('#micLabel'), toggleBtn = $('#toggleBtn'),
-        soundBtn = $('#soundBtn'), stat = $('#stat'), statText = $('#statText');
+        stat = $('#stat'), statText = $('#statText');
 
   let state = 'closed';           // closed | opening | open | closing
-  let soundOn = true;
-
-  /* ───────── Звук: шуршание пергамента ───────── */
-  let ac = null;
-  function audio(){
-    try{
-      if(!ac) ac = new (window.AudioContext || window.webkitAudioContext)();
-      if(ac.state === 'suspended') ac.resume();
-    }catch(e){ ac = null; }
-    return ac;
-  }
-  function rustle(dur = 1.4, vol = .5){
-    if(!soundOn) return;
-    const c = audio(); if(!c) return;
-    const n = Math.floor(c.sampleRate * dur);
-    const buf = c.createBuffer(1, n, c.sampleRate), d = buf.getChannelData(0);
-    let env = 0, lp = 0;
-    for(let i = 0; i < n; i++){
-      if(Math.random() < 0.0016) env = .6 + Math.random() * .8;       // «хруст» складки
-      env *= 0.9992;
-      const white = Math.random() * 2 - 1;
-      lp += (white - lp) * .55;
-      const t = i / n, shape = Math.sin(Math.PI * Math.min(1, t * 1.15));
-      d[i] = (white * .35 + lp * .35 + white * env * .6) * shape;
-    }
-    const src = c.createBufferSource(); src.buffer = buf;
-    const hp = c.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 500;
-    const bp = c.createBiquadFilter(); bp.type = 'peaking'; bp.frequency.value = 2400; bp.gain.value = 6; bp.Q.value = .8;
-    const g = c.createGain(); g.gain.value = vol * .32;
-    src.connect(hp); hp.connect(bp); bp.connect(g); g.connect(c.destination);
-    src.start();
-  }
-  function quill(){ // тихое «пишущее» шуршание на проявлении чернил
-    if(!soundOn) return;
-    const c = audio(); if(!c) return;
-    const dur = 1.8, n = Math.floor(c.sampleRate * dur);
-    const buf = c.createBuffer(1, n, c.sampleRate), d = buf.getChannelData(0);
-    for(let i = 0; i < n; i++){
-      const t = i / n, wob = .5 + .5 * Math.sin(t * 38 + Math.sin(t * 9) * 3);
-      d[i] = (Math.random() * 2 - 1) * wob * Math.sin(Math.PI * t) * .5;
-    }
-    const src = c.createBufferSource(); src.buffer = buf;
-    const bp = c.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 3200; bp.Q.value = .6;
-    const g = c.createGain(); g.gain.value = .07;
-    src.connect(bp); bp.connect(g); g.connect(c.destination); src.start();
-  }
 
   /* ───────── Следы шагов ───────── */
   const NS = 'http://www.w3.org/2000/svg';
@@ -651,13 +600,11 @@ section{margin-bottom:1.5em}
     toggleBtn.disabled = true;
     resetRec();
     assignDelays();
-    rustle(1.5, .6);
     body.classList.add('is-open');
     setStat(src === 'voice' ? 'Клятва принята.' : 'Открываю…');
     await sleep(900);
     page.classList.remove('no-trans');
     page.classList.add('ink-on');
-    quill();
     await sleep(1300);
     body.classList.add('gone');
     buildSteps();
@@ -678,11 +625,9 @@ section{margin-bottom:1.5em}
     flash.classList.add('on');
     page.classList.add('fading');
     page.classList.remove('walk');
-    rustle(.9, .35);
     await sleep(1500);
     flash.classList.remove('on');
     body.classList.remove('gone');
-    rustle(1.3, .6);
     body.classList.remove('is-open');
     await sleep(900);
     page.classList.add('no-trans');
@@ -783,7 +728,6 @@ section{margin-bottom:1.5em}
     if(rec && wantListen){ const r = rec; r.onend = () => { if(wantListen) startRec(); }; try{ r.abort(); }catch(e){} }
   }
   function toggleMic(){
-    audio();                    // жест пользователя — разрешает звук
     if(!SR){ setStat(); return; }
     wantListen = !wantListen;
     setMicUI(wantListen);
@@ -793,17 +737,10 @@ section{margin-bottom:1.5em}
 
   /* ───────── Кнопки и клавиши ───────── */
   micBtn.addEventListener('click', toggleMic);
-  toggleBtn.addEventListener('click', () => { audio(); toggle('button'); });
-  soundBtn.addEventListener('click', () => {
-    soundOn = !soundOn;
-    soundBtn.setAttribute('aria-pressed', String(soundOn));
-    $('#soundLabel').textContent = soundOn ? 'Звук' : 'Без звука';
-    $('#wave').style.display = soundOn ? '' : 'none';
-    if(soundOn) audio();
-  });
+  toggleBtn.addEventListener('click', () => toggle('button'));
   addEventListener('keydown', e => {
     if(e.target && e.target.tagName === 'BUTTON') return;
-    if(e.code === 'Space' || e.key === 'Enter'){ e.preventDefault(); audio(); toggle('key'); }
+    if(e.code === 'Space' || e.key === 'Enter'){ e.preventDefault(); toggle('key'); }
   });
 
   if(!SR){ micBtn.disabled = true; micLabel.textContent = 'Голос недоступен'; }
@@ -816,9 +753,6 @@ section{margin-bottom:1.5em}
       if(res.state === 'granted' && !wantListen){ wantListen = true; setMicUI(true); startRec(); setStat(); }
     }).catch(() => {});
   }
-  // звук шуршания разблокируется первым касанием страницы
-  const unlock = () => { audio(); removeEventListener('pointerdown', unlock); removeEventListener('keydown', unlock); };
-  addEventListener('pointerdown', unlock); addEventListener('keydown', unlock);
 })();
 </script>
 </body>
