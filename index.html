@@ -476,7 +476,7 @@ section{margin-bottom:1.5em}
     <span id="micLabel">Включить микрофон</span>
   </button>
   <button id="toggleBtn" type="button">Открыть вручную</button>
-  <div class="stat" id="stat" aria-live="polite"><span class="mic-dot"></span> <span id="statText">Микрофон выключен. Карту можно открыть кнопкой.</span></div>
+  <div class="stat" id="stat" aria-live="polite"><span id="statText">Микрофон выключен. Карту можно открыть кнопкой.</span></div>
 </div>
 
 <script>
@@ -601,7 +601,7 @@ section{margin-bottom:1.5em}
     resetRec();
     assignDelays();
     body.classList.add('is-open');
-    setStat(src === 'voice' ? 'Клятва принята.' : 'Открываю…');
+    setStat();
     await sleep(900);
     page.classList.remove('no-trans');
     page.classList.add('ink-on');
@@ -670,14 +670,12 @@ section{margin-bottom:1.5em}
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   let rec = null, wantListen = false, restarts = [];
 
+  // Подсказок на панели нет. Текст появляется только при проблеме: нет доступа, нет связи, браузер не умеет слушать.
   function setStat(msg){
-    if(msg !== undefined){ statText.textContent = msg; return; }
-    if(!SR){ statText.textContent = 'Голос не работает в этом браузере. Откройте в Chrome или Edge. Кнопка работает.'; return; }
-    if(wantListen){
-      statText.innerHTML = state === 'open'
-        ? 'Слушаю. Чтобы закрыть, скажите: <em>«Шалость удалась»</em>'
-        : 'Слушаю. Скажите: <em>«Торжественно клянусь, что замышляю только шалость»</em>';
-    } else statText.textContent = 'Микрофон выключен. Карту можно открыть кнопкой.';
+    let t = msg;
+    if(t === undefined) t = SR ? '' : 'Голос не работает в этом браузере. Откройте в Chrome или Edge. Кнопка работает.';
+    statText.textContent = t;
+    stat.style.display = t ? '' : 'none';
   }
   function setMicUI(on){
     micLabel.textContent = on ? 'Выключить микрофон' : 'Включить микрофон';
@@ -724,7 +722,7 @@ section{margin-bottom:1.5em}
     if(!SR){ setStat(); return; }
     wantListen = !wantListen;
     setMicUI(wantListen);
-    if(wantListen){ setStat('Запрашиваю микрофон…'); startRec(); setTimeout(() => { if(wantListen) setStat(); }, 1200); }
+    if(wantListen){ setStat(); startRec(); }
     else { try{ rec && rec.abort(); }catch(e){} rec = null; setStat(); }
   }
 
