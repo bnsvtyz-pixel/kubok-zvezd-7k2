@@ -659,7 +659,6 @@ section{margin-bottom:1.5em}
   function handleHeard(list){
     const texts = list.map(norm).map(t => t.slice(-140)).filter(Boolean);
     if(!texts.length) return;
-    heardNow(texts[0]);
     for(const t of texts){
       if(state === 'closed' && wantsOpen(t)){ openMap('voice'); return; }
       if(state === 'open' && wantsClose(t)){ closeMap('voice'); return; }
@@ -669,7 +668,7 @@ section{margin-bottom:1.5em}
 
   /* ───────── Микрофон ───────── */
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  let rec = null, wantListen = false, restarts = [], heardTimer = null, lastHeard = '';
+  let rec = null, wantListen = false, restarts = [];
 
   function setStat(msg){
     if(msg !== undefined){ statText.textContent = msg; return; }
@@ -679,12 +678,6 @@ section{margin-bottom:1.5em}
         ? 'Слушаю. Чтобы закрыть, скажите: <em>«Шалость удалась»</em>'
         : 'Слушаю. Скажите: <em>«Торжественно клянусь, что замышляю только шалость»</em>';
     } else statText.textContent = 'Микрофон выключен. Карту можно открыть кнопкой.';
-  }
-  function heardNow(t){
-    lastHeard = t;
-    statText.innerHTML = 'Слышу: <em>«' + t.slice(-60).replace(/</g, '&lt;') + '»</em>';
-    clearTimeout(heardTimer);
-    heardTimer = setTimeout(() => setStat(), 3500);
   }
   function setMicUI(on){
     micLabel.textContent = on ? 'Выключить микрофон' : 'Включить микрофон';
