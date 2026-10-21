@@ -212,7 +212,7 @@ section{margin-bottom:1.5em}
 
 .hunt{margin:0; padding:0; list-style:none; counter-reset:h}
 .hunt li{
-  display:grid; grid-template-columns:1.4em 1fr 31%; gap:0 10px; padding:.42em 0;
+  display:grid; grid-template-columns:1.4em 1fr; gap:0 10px; padding:.42em 0;
   border-bottom:1px dashed rgba(58,42,20,.35); align-items:start;
 }
 .hunt li:last-child{border-bottom:0}
@@ -231,7 +231,7 @@ section{margin-bottom:1.5em}
 }
 .cup b{font-weight:700}
 
-.foot{margin-top:6px; padding-top:12px; border-top:1.5px solid var(--line); display:flex; justify-content:space-between; align-items:center; gap:20px}
+.foot{margin-top:6px; padding-top:12px; border-top:1.5px solid var(--line); display:flex; justify-content:flex-end; align-items:center; gap:20px}
 .foot .nom{font-size:.88em}
 .foot .nom b{font-weight:700}
 .foot .sig{font-family:'Marck Script',cursive; font-size:clamp(24px,2.6vw,38px); color:var(--ink-red); white-space:nowrap; transform:rotate(-2deg)}
@@ -295,7 +295,7 @@ section{margin-bottom:1.5em}
   .col,.col:first-child,.col:last-child{padding:0}
   .col + .col::before{display:none}
   .col + .col{margin-top:6px}
-  .foot{flex-direction:column; align-items:flex-start}
+  .foot{flex-direction:column; align-items:flex-end}
   .front .big{font-size:clamp(34px,10vw,64px)}
   .hunt li{grid-template-columns:1.4em 1fr}
   .hunt .pr{grid-column:2}
@@ -452,14 +452,14 @@ section{margin-bottom:1.5em}
         <h2 class="ink">Охота за крестражами <small>одно задание в неделю</small></h2>
         <p class="ink" style="margin:.1em 0 .5em">Победителю — приз недели и Оборотное зелье, факультету +40. За три крестража и больше ещё +100. Не уничтожили за неделю — крестраж остаётся в игре до конца сезона.</p>
         <ol class="hunt">
-          <li class="ink"><span class="n">1</span><span><b>Дневник.</b> Просрочка перед цессией: больше всех собрать за неделю</span><span class="pr">тематические шахматы</span></li>
-          <li class="ink"><span class="n">2</span><span><b>Кольцо.</b> Клиент с 5+ ложными обещаниями: первым получить платёж</span><span class="pr">дневник Тома Реддла (или носки «Добби свободен» и выходной)</span></li>
-          <li class="ink"><span class="n">3</span><span><b>Медальон.</b> Долг без контакта больше 90 дней: первым закрыть</span><span class="pr">статуэтка (или маховик времени)</span></li>
-          <li class="ink"><span class="n">4</span><span><b>Чаша.</b> Самый крупный платёж за неделю</span><span class="pr">статуэтка дракона</span></li>
-          <li class="ink"><span class="n">5</span><span><b>Диадема.</b> Вывести неконтактного клиента на входящий звонок и закрыть долг первым</span><span class="pr">магический шар</span></li>
-          <li class="ink"><span class="n">6</span><span><b>Нагайна.</b> 120+ дней: первым вернуть в график или закрыть договор</span><span class="pr">«Расширенный курс зельеварения»</span></li>
-          <li class="ink"><span class="n">7</span><span><b>Дары Смерти, ч. 1.</b> Сильнее всех превысить свой средний % за сезон</span><span class="pr">Делюминатор, «Сказки барда Бидля»</span></li>
-          <li class="ink"><span class="n">8</span><span><b>Дары Смерти, ч. 2, «Гарри».</b> Долги с большой просрочкой по списку: собрать больше всех</span><span class="pr m">Бузинная палочка, мантия-невидимка, Воскрешающий камень</span></li>
+          <li class="ink"><span class="n">1</span><span><b>Дневник.</b> Просрочка перед цессией: больше всех собрать за неделю</span></li>
+          <li class="ink"><span class="n">2</span><span><b>Кольцо.</b> Клиент с 5+ ложными обещаниями: первым получить платёж</span></li>
+          <li class="ink"><span class="n">3</span><span><b>Медальон.</b> Долг без контакта больше 90 дней: первым закрыть</span></li>
+          <li class="ink"><span class="n">4</span><span><b>Чаша.</b> Самый крупный платёж за неделю</span></li>
+          <li class="ink"><span class="n">5</span><span><b>Диадема.</b> Вывести неконтактного клиента на входящий звонок и закрыть долг первым</span></li>
+          <li class="ink"><span class="n">6</span><span><b>Нагайна.</b> 120+ дней: первым вернуть в график или закрыть договор</span></li>
+          <li class="ink"><span class="n">7</span><span><b>Дары Смерти, ч. 1.</b> Сильнее всех превысить свой средний % за сезон</span></li>
+          <li class="ink"><span class="n">8</span><span><b>Дары Смерти, ч. 2, «Гарри».</b> Долги с большой просрочкой по списку: собрать больше всех</span></li>
         </ol>
       </section>
 
@@ -483,7 +483,6 @@ section{margin-bottom:1.5em}
   </div>
 
   <footer class="foot">
-    <div class="nom ink"><b>Номинации:</b> Ловец снитча · Староста года · Защита от тёмных искусств · Мастер зелий · Невилл Долгопупс · Дуэлянт года · Патронус · Орден Мерлина</div>
     <div class="sig ink">Шалость удалась</div>
   </footer>
 </main>
